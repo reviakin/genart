@@ -14,18 +14,19 @@ const sketch = () => {
   const createGrid = () => {
     const points = [];
     // const count = random.rangeFloor(20, 40);
-    const count = 30;
+    const count = 40;
     for (let x = 0; x < count; x++) {
       for (let y = 0; y < count; y++) {
         const u = count <= 1 ? 0.5 : x / (count - 1);
         const v = count <= 1 ? 0.5 : y / (count - 1);
-        // const radius = Math.abs(0.01 + random.gaussian() * 0.01);
-        const radius = Math.abs(random.noise2D(u, v)) * 0.05;
+        const radius = Math.abs(random.noise2D(u, v)) * 0.2;
         const color = random.pick(pallet);
+        const rotation = random.noise2D(u, v);
         points.push({
           radius,
           position: [u, v],
           color,
+          rotation,
         });
       }
     }
@@ -36,15 +37,23 @@ const sketch = () => {
   const margin = 400;
 
   return ({ context, width, height }) => {
-    points.forEach(({ radius, position, color }) => {
+    points.forEach(({ radius, position, color, rotation }) => {
       const [u, v] = position;
       const x = lerp(margin, width - margin, u);
       const y = lerp(margin, height - margin, v);
 
-      context.beginPath();
-      context.arc(x, y, radius * width, 0, Math.PI * 2, false);
+      // context.beginPath();
+      // context.arc(x, y, radius * width, 0, Math.PI * 2, false);
+      // context.fillStyle = color;
+      // context.fill();
+      context.save();
       context.fillStyle = color;
-      context.fill();
+      context.font = `${radius * width}px "Helvetica"`;
+      context.translate(x, y);
+      context.rotate(rotation);
+      context.fillText("reviakin", 0, 0);
+
+      context.restore();
     });
   };
 };
