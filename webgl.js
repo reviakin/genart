@@ -1,5 +1,7 @@
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require("three");
+const random = require("canvas-sketch-util/random");
+const pallets = require("nice-color-palettes");
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -7,20 +9,23 @@ require("three/examples/js/controls/OrbitControls");
 const canvasSketch = require("canvas-sketch");
 
 const settings = {
+  dimensions: [512, 512],
+  fps: 24,
+  duration: 4,
   // Make the loop animated
   animate: true,
   // Get a WebGL canvas rather than 2D
-  context: "webgl"
+  context: "webgl",
 };
 
 const sketch = ({ context }) => {
   // Create a renderer
   const renderer = new THREE.WebGLRenderer({
-    canvas: context.canvas
+    canvas: context.canvas,
   });
 
   // WebGL background color
-  renderer.setClearColor("#000", 1);
+  renderer.setClearColor("hsl(0,0%,90%)", 1);
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
@@ -34,17 +39,37 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene();
 
   // Setup a geometry
-  const geometry = new THREE.SphereGeometry(1, 32, 16);
-
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
   // Setup a material
-  const material = new THREE.MeshBasicMaterial({
-    color: "red",
-    wireframe: true
-  });
 
-  // Setup a mesh with geometry + material
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  for (let i = 0; i < 40; i++) {
+    // Setup a mesh with geometry + material
+    const pallet = random.pick(pallets);
+    const material = new THREE.MeshStandardMaterial({
+      color: random.pick(pallet),
+      // wireframe: true,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(
+      random.range(-1, 1),
+      random.range(-1, 1),
+      random.range(-1, 1)
+    );
+    mesh.scale.set(
+      random.range(-1, 1),
+      random.range(-1, 1),
+      random.range(-1, 1)
+    );
+    mesh.scale.multiplyScalar(0.9);
+
+    scene.add(mesh);
+  }
+
+  scene.add(new THREE.AmbientLight("blue"));
+
+  const light = new THREE.DirectionalLight("white", 1);
+  scene.add(light);
 
   // draw each frame
   return {
@@ -56,7 +81,9 @@ const sketch = ({ context }) => {
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
-    render({ time }) {
+    render({ playhead }) {
+      scene.rotation.y = Math.sin(playhead * Math.PI * 2) * 2;
+
       controls.update();
       renderer.render(scene, camera);
     },
@@ -64,7 +91,7 @@ const sketch = ({ context }) => {
     unload() {
       controls.dispose();
       renderer.dispose();
-    }
+    },
   };
 };
 
