@@ -2,6 +2,7 @@
 global.THREE = require("three");
 const random = require("canvas-sketch-util/random");
 const pallets = require("nice-color-palettes");
+const eases = require("eases");
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -82,7 +83,8 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ playhead }) {
-      scene.rotation.y = Math.sin(playhead * Math.PI * 2) * 2;
+      const t = Math.sin(playhead * Math.PI);
+      scene.rotation.z = eases.expoInOut(t);
 
       controls.update();
       renderer.render(scene, camera);
