@@ -3,6 +3,7 @@ global.THREE = require("three");
 const random = require("canvas-sketch-util/random");
 const pallets = require("nice-color-palettes");
 const eases = require("eases");
+const CubicBezier = require("cubic-bezier-easing");
 
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
@@ -71,6 +72,7 @@ const sketch = ({ context }) => {
 
   const light = new THREE.DirectionalLight("white", 1);
   scene.add(light);
+  const easyFn = new CubicBezier(0.67, 0.03, 0.29, 0.99);
 
   // draw each frame
   return {
@@ -84,7 +86,7 @@ const sketch = ({ context }) => {
     // Update & render your scene here
     render({ playhead }) {
       const t = Math.sin(playhead * Math.PI);
-      scene.rotation.z = eases.expoInOut(t);
+      scene.rotation.z = easyFn(t);
 
       controls.update();
       renderer.render(scene, camera);
