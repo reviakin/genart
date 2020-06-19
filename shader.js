@@ -16,7 +16,7 @@ const frag = glsl(/* glsl */ `
   varying vec2 vUv;
 
   void main () {
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 0.1); 
+    gl_FragColor = vec4(vec3(vUv.y), 1.0); 
   }
 `);
 
